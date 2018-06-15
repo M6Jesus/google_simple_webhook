@@ -53,60 +53,73 @@ public class MessageController {
 	public ResponseEntity<Reponse> posterUnMessage(@RequestBody Request request) {
 		logger.debug("========message arriver a la webhook========================");
 		QueryResult queryResult = request.getQueryResult();
-//		Parameters parameter = queryResult.getParameters();
-//		Map<String, String> param = parameter.getParameters();
 		String valeurQuestion = queryResult.getQueryText();
-//		String valeurQuestion;
-		Reponse reponse = new Reponse();
-		
-		if (valeurQuestion != null) {
-//			valeurQuestion = param.get("question");
+		// message de fin qu cas ou je recois "merci google"
+
+		if (valeurQuestion.contains("merci") || valeurQuestion.contains("google")) {
+			Reponse reponse = creationReponse("je vous en prie c'est mon devoir! a bientot pamela");
+			return ResponseEntity.status(HttpStatus.OK).body(reponse);
+		} else {
 			ArriverMessage arriverMessage = new ArriverMessage(this, valeurQuestion);
 			// publication de l'evenement
 			applicationEventPublisher.publishEvent(arriverMessage);
-			
 			ResponseEntity<String> reponseApi = messageService.envoiMessage(arriverMessage);
-			String reponseApiString = reponseApi.getBody();
-			
-			SimpleResponse simpleResponse = new SimpleResponse();
-			simpleResponse.setTextToSpeech(reponseApiString);
-			simpleResponse.setDisplayText(reponseApiString);
-			
-			Items items = new Items();
-			items.setSimpleResponse(simpleResponse);
-			
-			RichResponse richResponse = new RichResponse();
-			List<Items> liste = new ArrayList<>();
-			liste.add(items);
-			richResponse.setItems(liste);
-			Google google = new Google();
-			google.setExpectUserResponse(true);
-			google.setRichResponse(richResponse);
-			Payload payload = new Payload();
-			payload.setGoogle(google);
-			reponse.setPayload(payload);
+			if (reponseApi != null) {
+				String reponseApiString = reponseApi.getBody();
 
-			// List<FulfillmentMessages> fulfillmentMessages = new ArrayList<>();
-			org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages fulfillmentMessages = new org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages();
+				// au cas ou j'ai une reponse en anglais true ou false
+				if (reponseApiString.contains("true")) {
+					reponseApiString = reponseApiString.replace("true", "oui, effectivement");
+				} else if (reponseApiString.contains("false")) {
+					reponseApiString = reponseApiString.replace("false", "non, pas du tout");
+				}
+				Reponse reponse = creationReponse(reponseApiString);
+				return ResponseEntity.status(HttpStatus.OK).body(reponse);
+			} else {
+				Reponse reponse = creationReponse("desoler je n'ai pas de donnée a ce sujet");
 
-			org.norsys.pamela.webhookSimple.model.response.Text texte = new org.norsys.pamela.webhookSimple.model.response.Text();
-
-			List<String> listess = new ArrayList<>();
-			listess.add(reponseApiString);
-			texte.setText(listess);
-			fulfillmentMessages.setText(texte);
-
-			List<org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages> listes = new ArrayList<>();
-			listes.add(fulfillmentMessages);
-			reponse.setFulfillmentMessages(listes);
-
-			
-
-			return ResponseEntity.status(HttpStatus.OK).body(reponse);
+				return ResponseEntity.status(HttpStatus.OK).body(reponse);
+			}
 		}
 
+	}
+
+	private Reponse creationReponse(String messageReponse) {
+		Reponse reponse = new Reponse();
+		SimpleResponse simpleResponse = new SimpleResponse();
+		simpleResponse.setTextToSpeech(messageReponse);
+		simpleResponse.setDisplayText(messageReponse);
+
+		Items items = new Items();
+		items.setSimpleResponse(simpleResponse);
+
+		RichResponse richResponse = new RichResponse();
+		List<Items> liste = new ArrayList<>();
+		liste.add(items);
+		richResponse.setItems(liste);
+		Google google = new Google();
+		google.setExpectUserResponse(true);
+		google.setRichResponse(richResponse);
+		Payload payload = new Payload();
+		payload.setGoogle(google);
+		reponse.setPayload(payload);
+
+		// List<FulfillmentMessages> fulfillmentMessages = new ArrayList<>();
+		org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages fulfillmentMessages = new org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages();
+
+		org.norsys.pamela.webhookSimple.model.response.Text texte = new org.norsys.pamela.webhookSimple.model.response.Text();
+
+		List<String> listess = new ArrayList<>();
+		listess.add(messageReponse);
+		texte.setText(listess);
+		fulfillmentMessages.setText(texte);
+
+		List<org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages> listes = new ArrayList<>();
+		listes.add(fulfillmentMessages);
+		reponse.setFulfillmentMessages(listes);
 		logger.debug("========message arriver a la webhook et publier=============");
-		return ResponseEntity.status(HttpStatus.OK).body(reponse);
+
+		return reponse;
 	}
 
 	@PostMapping("/message2")

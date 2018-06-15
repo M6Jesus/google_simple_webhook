@@ -15,36 +15,138 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class MessageService {
-	
-	
 
 	private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
 	private RestTemplate restTemplate;
-	
+
 	private String urlApi;
 
+	@Value("${resource.tousLesMedecins}")
+	private String tousLesMedecins;
+
+	@Value("${resource.estDisponible}")
+	private String estDisponible;
+
+	@Value("${resource.specialite}")
+	private String specialite;
+
+	@Value("${resource.hopital}")
+	private String hopital;
+
+	@Value("${resource.nomParSpecialite}")
+	private String nomParSpecialite;
+
+	@Value("${resource.nomParHopital}")
+	private String nomParHopital;
+
+	@Value("${resource.nomParDisponibilite}")
+	private String nomParDisponibilite;
+
+	@Value("${resource.tousLesVacins}")
+	private String tousLesVacins;
+
+	@Value("${resource.estObligatoire}")
+	private String estObligatoire;
+
+	@Value("${resource.vaccinParPays}")
+	private String vaccinParPays;
+
+	// @Autowired
+	// public MessageService(RestTemplateBuilder restTemplateBuilder,
+	// @Value("${rest.api.url}") String urlApi) {
+	// this.restTemplate = restTemplateBuilder.build();
+	// this.urlApi = urlApi;
+	// }
 	@Autowired
-	public MessageService(RestTemplateBuilder restTemplateBuilder, @Value("${rest.api.url}") String urlApi) {
+	public MessageService(RestTemplateBuilder restTemplateBuilder) {
 		this.restTemplate = restTemplateBuilder.build();
-		this.urlApi = urlApi;
 	}
 
 	@EventListener
 	public void messageRecuEventListener(ArriverMessage messageRecuEvent) {
 		String messageGoogle = messageRecuEvent.getMessage();
 
-		logger.debug("=======le message de google {} est en train d'etre ecouter dans le service", messageGoogle + "=============");
-
+		logger.debug("=======le message de google {} est en train d'etre ecouter dans le service",
+				messageGoogle + "=============");
 		// envoie du message a la destination
-		envoyerMessageALaDestination(messageRecuEvent.getMessage(), urlApi);
+		// envoyerMessageALaDestination(messageRecuEvent.getMessage(), urlApi);
 
 	}
-	
+
 	public ResponseEntity<String> envoiMessage(ArriverMessage messageRecuEvent) {
 		String messageGoogle = messageRecuEvent.getMessage();
 
-		logger.debug("=======le message de google {} est en train d'etre ecouter dans le service", messageGoogle + "=============");
+		logger.debug("=======le message de google {} est en train d'etre ecouter dans le service",
+				messageGoogle + "=============");
+		this.urlApi = null;
+		
+		String question = messageRecuEvent.getMessage().toLowerCase();
+		if (question.contains("medecin")) {
+			if (question.contains("tous") && !isSpecialityPresent(question) && !isHopitalNamePresent(question)) {
+				this.urlApi = tousLesMedecins;
+			}
+			else if(isSpecialityPresent(question)) {
+				String specialite = findSpecialityName(question);
+				this.urlApi = nomParSpecialite + "?specialite="+ specialite ;
+			}
+			else if(isHopitalNamePresent(question)) {
+				String hopital = findHopitalName(question);
+				this.urlApi = nomParHopital + "?hopital=" + hopital;
+			}
+			else if(question.contains("disponible")) {
+				this.urlApi = nomParDisponibilite;
+			}
+		}else if(isDoctorNamePresent(question)) {
+			String NomMedecin = findDoctorName(question);
+			if(question.contains("disponible")) {
+				this.urlApi = estDisponible + "?nomMedecin=" + NomMedecin;
+			}
+			else if(question.contains("specialite")) {
+				this.urlApi = specialite + "?nomMedecin=" + NomMedecin;
+			}
+			else if(question.contains("hopital") || question.contains("centre") || question.contains("clinique")) {
+				this.urlApi = hopital + "?nomMedecin=" + NomMedecin;
+			}
+		}
+		else if(question.contains("obligatoire") && isVaccinNamePresent(question)) {
+				String nomVaccin = findVaccinName(question);
+				this.urlApi = estObligatoire + "?nomVaccin=" + nomVaccin;
+			
+		}else if(question.contains("vaccin")) {
+			if( (question.contains("tous") || question.contains("liste") || question.contains("different") ) && (!isCountryPresent(question)) && (!question.contains("obligatoire")) ){
+				this.urlApi = tousLesVacins;
+			}
+			else if(isCountryPresent(question)) {
+				String pays = findCountryName(question);
+				this.urlApi = vaccinParPays + "?Pays=" + pays;
+			}
+		}
+		
+			
+//			if (messageRecuEvent.getMessage().contains("quel") || messageRecuEvent.getMessage().contains("liste")) {
+//				this.urlApi = tousLesMedecins;
+//			} else if (messageRecuEvent.getMessage().contains("disponible")
+//					|| messageRecuEvent.getMessage().contains("docteur")
+//					|| messageRecuEvent.getMessage().contains("proffesseur")) {
+//				if (messageRecuEvent.getMessage().contains("docteur")) {
+//					// this.urlApi = estDisponible;
+//				} else if (messageRecuEvent.getMessage().contains("proffesseur")) {
+//					// this.urlApi = estDisponible;
+//				}
+//
+//			} else if (messageRecuEvent.getMessage().contains("disponible")) {
+//				this.urlApi = nomParDisponibilite;
+//			}
+//		} else if (messageRecuEvent.getMessage().contains("vaccin")) {
+//			if (messageRecuEvent.getMessage().contains("tous") || messageRecuEvent.getMessage().contains("differents")
+//					|| messageRecuEvent.getMessage().contains("quel")
+//					|| messageRecuEvent.getMessage().contains("liste")) {
+//				this.urlApi = tousLesVacins;
+//			}
+//		} else {
+//			this.urlApi = null;
+//		}
 
 		// envoie du message a la destination
 		return envoyerMessageALaDestination(messageRecuEvent.getMessage(), urlApi);
@@ -55,21 +157,184 @@ public class MessageService {
 		logger.debug("debut de l'envoi du message pour la destination {}", url);
 		ResponseEntity<String> reponse = null;
 		try {
-			//HttpHeaders headers = new HttpHeaders();
+			if (url != null) {
+				reponse = restTemplate.getForEntity(url, String.class);
+			} else {
+				reponse = null;
+			}
 
-			//headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
-			//HttpEntity<String> request = new HttpEntity<>(message, headers);
-			//Thread.sleep(500);
-			reponse = restTemplate.getForEntity(url, String.class);
-			
 			logger.info("réponse de l'api : {}", reponse.getBody());
-			
+
 		} catch (Exception ex) {
-			logger.info("Le messageGoogleProcessor a la destination a rencontrer une exeption : {}", ex.getMessage());
+			logger.info("L'envoie du message a la destination a rencontrer une exeption : {} a l'url : {}", ex.getMessage(), url);
 		}
 		return reponse;
 	}
 
+	// les differentes methodes de controle de presence de mots
 
+	private boolean isDoctorNamePresent(String question) {
+		if (question.contains("professeur dupuis") || question.contains("docteur anne eyouk")
+				|| question.contains("docteur dupont") || question.contains("docteur grace")
+				|| question.contains("docteur oben") || question.contains("docteur ansen")
+				|| question.contains("docteur chance") || question.contains("professeur soigne")
+				|| question.contains("docteur legrand") || question.contains("professeur lefin")) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isVaccinNamePresent(String question) {
+		if (question.contains("bcg tuberculose") || question.contains("tétanos") || question.contains("hépatite B")
+				|| question.contains("diphtérie") || question.contains("poliomyélite")
+				|| question.contains("haemophilus influenzae b") || question.contains("coqueluche")
+				|| question.contains("fièvre jaune") || question.contains("gastro-entérite à rotavirus")
+				|| question.contains("grippe saisonnière") || question.contains("hépatite A")) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isSpecialityPresent(String question) {
+		if (question.contains("gynécologue") || question.contains("generaliste") || question.contains("ophtalmologue")
+				|| question.contains("nutritioniste") || question.contains("gastro-enterologue")
+				|| question.contains("dentiste") || question.contains("chirurgien opthtalmologue")) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isHopitalNamePresent(String question) {
+		if (question.contains("hopital lyon-sud") || question.contains("hopital edouard heriot")
+				|| question.contains("clinique natecia") || question.contains("hopital gratte ciel")
+				|| question.contains("hopital mere et enfant")) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isCountryPresent(String question) {
+		if (question.contains("cameroun") || question.contains("france") || question.contains("espagne")
+				|| question.contains("italie") || question.contains("gabon") || question.contains("chine")
+				|| question.contains("japon") || question.contains("congo")) {
+			return true;
+		}
+		return false;
+	}
+
+	// les differentes methodes qui cherchent les mot effectivent present
+
+	private String findDoctorName(String question) {
+		String retour = null;
+		if (question.contains("professeur dupuis")) {
+			retour = "professeur dupuis";
+		} else if (question.contains("docteur anne eyouk")) {
+			retour = "Docteur anne eyouk";
+		} else if (question.contains("docteur dupont")) {
+			retour = "Docteur dupont";
+		} else if (question.contains("docteur grace")) {
+			retour = "Docteur grace";
+		} else if (question.contains("docteur oben")) {
+			retour = "Docteur OBEN";
+		} else if (question.contains("docteur ansen")) {
+			retour = "Docteur ansen";
+		} else if (question.contains("docteur chance")) {
+			retour = "Docteur chance";
+		} else if (question.contains("professeur soigne")) {
+			retour = "professeur soigne";
+		} else if (question.contains("docteur legrand")) {
+			retour = "Docteur legrand";
+		} else if (question.contains("professeur lefin")) {
+			retour = ("professeur lefin");
+		}
+		return retour;
+	}
+
+	private String findVaccinName(String question) {
+		String retour = null;
+		if (question.contains("bcg tuberculose")) {
+			retour = "BCG tuberculose";
+		} else if (question.contains("tétanos")) {
+			retour = "Tétanos";
+		} else if (question.contains("hépatite B")) {
+			retour = "Hépatite B";
+		} else if (question.contains("diphtérie")) {
+			retour = "Diphtérie";
+		} else if (question.contains("poliomyélite")) {
+			retour = "Poliomyélite";
+		} else if (question.contains("haemophilus influenzae b")) {
+			retour = "Haemophilus influenzae b";
+		} else if (question.contains("coqueluche")) {
+			retour = "Coqueluche";
+		} else if (question.contains("fièvre jaune")) {
+			retour = "Fièvre jaune";
+		} else if (question.contains("gastro-entérite à rotavirus")) {
+			retour = "Gastro-entérite à rotavirus";
+		} else if (question.contains("hépatite A")) {
+			retour = ("Hépatite A");
+		} else if (question.contains("grippe saisonnière")) {
+			retour = ("Grippe saisonnière");
+		}
+		return retour;
+	}
+
+	private String findHopitalName(String question) {
+		String retour = null;
+		if (question.contains("hopital lyon-sud")) {
+			retour = "hopital lyon-sud";
+		} else if (question.contains("hopital edouard heriot")) {
+			retour = "hopital edouard heriot";
+		} else if (question.contains("hopital gratte ciel")) {
+			retour = "hopital gratte ciel";
+		} else if (question.contains("clinique natecia")) {
+			retour = "Clinique natecia";
+		} else if (question.contains("hopital mere et enfant")) {
+			retour = "hopital mere et enfant";
+		}
+		return retour;
+	}
+
+	private String findSpecialityName(String question) {
+		String retour = null;
+		if (question.contains("gynécologue")) {
+			retour = "gynécologue";
+		} else if (question.contains("generaliste")) {
+			retour = "generaliste";
+		} else if (question.contains("ophtalmologue")) {
+			retour = "ophtalmologue";
+		} else if (question.contains("nutritioniste")) {
+			retour = "nutritioniste";
+		} else if (question.contains("dentiste")) {
+			retour = "dentiste";
+		} else if (question.contains("gastro-enterologue")) {
+			retour = "gastro-enterologue";
+		} else if (question.contains("chirurgien opthtalmologue")) {
+			retour = "chirurgien opthtalmologue";
+		}
+		return retour;
+
+	}
+
+	private String findCountryName(String question) {
+		String retour = null;
+		if (question.contains("cameroun")) {
+			retour = "cameroun";
+		} else if (question.contains("france")) {
+			retour = "france";
+		} else if (question.contains("espagne")) {
+			retour = "espagne";
+		} else if (question.contains("italie")) {
+			retour = "italie";
+		} else if (question.contains("gabon")) {
+			retour = "gabon";
+		} else if (question.contains("chine")) {
+			retour = "chine";
+		} else if (question.contains("japon")) {
+			retour = "japon";
+		} else if (question.contains("congo")) {
+			retour = "congo";
+		}
+		return retour;
+	}
 
 }
