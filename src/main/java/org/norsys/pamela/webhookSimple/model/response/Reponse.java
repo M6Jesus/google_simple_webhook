@@ -6,6 +6,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+
+/**
+ * cette classe represente l'objet Reponse
+ * @author panou
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "fulfillmentText", "fulfillmentMessages", "source", "payload", "outputContexts", "followupEventInput" })
 public class Reponse {

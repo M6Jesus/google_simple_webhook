@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -51,13 +49,11 @@ public class MessageService {
 
 	@Value("${resource.vaccinParPays}")
 	private String vaccinParPays;
-
-	// @Autowired
-	// public MessageService(RestTemplateBuilder restTemplateBuilder,
-	// @Value("${rest.api.url}") String urlApi) {
-	// this.restTemplate = restTemplateBuilder.build();
-	// this.urlApi = urlApi;
-	// }
+	
+	/**
+	 * Construction du restTemplate
+	 * @param restTemplateBuilder
+	 */
 	@Autowired
 	public MessageService(RestTemplateBuilder restTemplateBuilder) {
 		this.restTemplate = restTemplateBuilder.build();
@@ -73,7 +69,11 @@ public class MessageService {
 		// envoyerMessageALaDestination(messageRecuEvent.getMessage(), urlApi);
 
 	}
-
+	/**
+	 * 
+	 * @param messageRecuEvent : le message de l'utilisateur sur dialogflow
+	 * @return une reponse
+	 */
 	public ResponseEntity<String> envoiMessage(ArriverMessage messageRecuEvent) {
 		String messageGoogle = messageRecuEvent.getMessage();
 
@@ -122,37 +122,16 @@ public class MessageService {
 				this.urlApi = vaccinParPays + "?Pays=" + pays;
 			}
 		}
-		
-			
-//			if (messageRecuEvent.getMessage().contains("quel") || messageRecuEvent.getMessage().contains("liste")) {
-//				this.urlApi = tousLesMedecins;
-//			} else if (messageRecuEvent.getMessage().contains("disponible")
-//					|| messageRecuEvent.getMessage().contains("docteur")
-//					|| messageRecuEvent.getMessage().contains("proffesseur")) {
-//				if (messageRecuEvent.getMessage().contains("docteur")) {
-//					// this.urlApi = estDisponible;
-//				} else if (messageRecuEvent.getMessage().contains("proffesseur")) {
-//					// this.urlApi = estDisponible;
-//				}
-//
-//			} else if (messageRecuEvent.getMessage().contains("disponible")) {
-//				this.urlApi = nomParDisponibilite;
-//			}
-//		} else if (messageRecuEvent.getMessage().contains("vaccin")) {
-//			if (messageRecuEvent.getMessage().contains("tous") || messageRecuEvent.getMessage().contains("differents")
-//					|| messageRecuEvent.getMessage().contains("quel")
-//					|| messageRecuEvent.getMessage().contains("liste")) {
-//				this.urlApi = tousLesVacins;
-//			}
-//		} else {
-//			this.urlApi = null;
-//		}
-
 		// envoie du message a la destination
 		return envoyerMessageALaDestination(messageRecuEvent.getMessage(), urlApi);
 
 	}
-
+	/**
+	 * 
+	 * @param message : le message a envoyer
+	 * @param url : l'adresse url
+	 * @return a reponse de l'api
+	 */
 	private ResponseEntity<String> envoyerMessageALaDestination(String message, String url) {
 		logger.debug("debut de l'envoi du message pour la destination {}", url);
 		ResponseEntity<String> reponse = null;
@@ -171,8 +150,15 @@ public class MessageService {
 		return reponse;
 	}
 
-	// les differentes methodes de controle de presence de mots
-
+	
+	//============================================= LES METHODES =======================================================================
+	
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return true ou false si un nom de docteur est present
+	 */
 	private boolean isDoctorNamePresent(String question) {
 		if (question.contains("professeur dupuis") || question.contains("docteur anne eyouk")
 				|| question.contains("docteur dupont") || question.contains("docteur grace")
@@ -183,7 +169,12 @@ public class MessageService {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return true ou false si un nom de vaccin est present dans la question
+	 */
 	private boolean isVaccinNamePresent(String question) {
 		if (question.contains("bcg tuberculose") || question.contains("tétanos") || question.contains("hépatite B")
 				|| question.contains("diphtérie") || question.contains("poliomyélite")
@@ -194,7 +185,12 @@ public class MessageService {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return true ou false si un nom de specialite est present dans la question
+	 */
 	private boolean isSpecialityPresent(String question) {
 		if (question.contains("gynécologue") || question.contains("generaliste") || question.contains("ophtalmologue")
 				|| question.contains("nutritioniste") || question.contains("gastro-enterologue")
@@ -203,7 +199,12 @@ public class MessageService {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 
+	 * @param question : la question de l'utilisateur
+	 * @return true ou false si un nom d'hopital est present dans la question
+	 */
 	private boolean isHopitalNamePresent(String question) {
 		if (question.contains("hopital lyon-sud") || question.contains("hopital edouard heriot")
 				|| question.contains("clinique natecia") || question.contains("hopital gratte ciel")
@@ -212,7 +213,12 @@ public class MessageService {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return true ou false si un nom de pays est present dans la question
+	 */
 	private boolean isCountryPresent(String question) {
 		if (question.contains("cameroun") || question.contains("france") || question.contains("espagne")
 				|| question.contains("italie") || question.contains("gabon") || question.contains("chine")
@@ -222,8 +228,12 @@ public class MessageService {
 		return false;
 	}
 
-	// les differentes methodes qui cherchent les mot effectivent present
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return le nom du docteur present dans la question
+	 */
 	private String findDoctorName(String question) {
 		String retour = null;
 		if (question.contains("professeur dupuis")) {
@@ -249,7 +259,12 @@ public class MessageService {
 		}
 		return retour;
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return le nom du vaccin present dans la question
+	 */
 	private String findVaccinName(String question) {
 		String retour = null;
 		if (question.contains("bcg tuberculose")) {
@@ -277,7 +292,12 @@ public class MessageService {
 		}
 		return retour;
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return le nom de l'hopital present dans la question
+	 */
 	private String findHopitalName(String question) {
 		String retour = null;
 		if (question.contains("hopital lyon-sud")) {
@@ -293,7 +313,12 @@ public class MessageService {
 		}
 		return retour;
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return le nom de la specialite present dans la question
+	 */
 	private String findSpecialityName(String question) {
 		String retour = null;
 		if (question.contains("gynécologue")) {
@@ -314,7 +339,12 @@ public class MessageService {
 		return retour;
 
 	}
-
+	
+	/**
+	 * 
+	 * @param question: la question de l'utilisateur
+	 * @return le nom dy pays present dans la question
+	 */
 	private String findCountryName(String question) {
 		String retour = null;
 		if (question.contains("cameroun")) {

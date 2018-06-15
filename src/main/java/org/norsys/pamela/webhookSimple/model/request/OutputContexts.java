@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * cette classe represente un parametre de la queryResult
+ * cette classe represente l'objet OutputContexts d'un requête
  * @author panou
  *
  */

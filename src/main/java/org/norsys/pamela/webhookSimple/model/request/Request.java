@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+
+/**
+ * Cette classe est une representation de l'objet requête 
+ * @author panou
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "responseid", "session", "queryResult", "originalDetectIntentRequest"})
 public class Request {

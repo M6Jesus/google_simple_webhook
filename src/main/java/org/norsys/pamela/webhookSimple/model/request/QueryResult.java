@@ -6,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
+/**
+ * cette classe reprensente l'objet queryResult d'une requête
+ * @author panou
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "queryText", "action", "parameters", "allRequiredParamsPresent", "fulfillmentText", "fulfillmentMessages", "outputContexts", 
 	"intent", "intentDetectionConfidence", "diagnosticInfo",   "languageCode", "originalDetectIntentRequest"})

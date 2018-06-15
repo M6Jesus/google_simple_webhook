@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * sous paramaetre du fulfilment message
+ * cette  classe est une representation de l'objet text d'une requête
  * @author panou
  *
  */

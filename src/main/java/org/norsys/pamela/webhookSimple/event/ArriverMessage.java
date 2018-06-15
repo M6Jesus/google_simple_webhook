@@ -2,7 +2,11 @@ package org.norsys.pamela.webhookSimple.event;
 
 import org.springframework.context.ApplicationEvent;
 
-
+/**
+ * classe representant le message de l'utilisateur sur dialogflow
+ * @author panou
+ *
+ */
 public class ArriverMessage extends ApplicationEvent {
 	
 	private static final long serialVersionUID = 1L;
