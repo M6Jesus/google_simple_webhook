@@ -62,9 +62,10 @@ public class MessageController {
 		// message de fin qu cas ou je recois "merci google"
 
 		if (valeurQuestion.contains("merci") || valeurQuestion.contains("google")) {
-			Reponse reponse = creationReponse("je vous en prie c'est mon devoir! a bientot pamela");
+			Reponse reponse = creationReponse("je t'en prie pamela. Qu'est ce que je peux faire pour toi");
 			return ResponseEntity.status(HttpStatus.OK).body(reponse);
-		} else {
+			
+		}else {
 			ArriverMessage arriverMessage = new ArriverMessage(this, valeurQuestion);
 			// publication de l'evenement
 			applicationEventPublisher.publishEvent(arriverMessage);
@@ -81,7 +82,7 @@ public class MessageController {
 				Reponse reponse = creationReponse(reponseApiString);
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			} else {
-				Reponse reponse = creationReponse("desoler je n'ai pas de donnée a ce sujet");
+				Reponse reponse = creationReponse("desoler je n'ai pas cette information");
 
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}

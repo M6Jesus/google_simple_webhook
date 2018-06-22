@@ -82,7 +82,7 @@ public class MessageService {
 		this.urlApi = null;
 		
 		String question = messageRecuEvent.getMessage().toLowerCase();
-		if (question.contains("medecin")) {
+		if (question.contains("médecin")) {
 			if (question.contains("tous") && !isSpecialityPresent(question) && !isHopitalNamePresent(question)) {
 				this.urlApi = tousLesMedecins;
 			}
@@ -102,10 +102,10 @@ public class MessageService {
 			if(question.contains("disponible")) {
 				this.urlApi = estDisponible + "?nomMedecin=" + NomMedecin;
 			}
-			else if(question.contains("specialite")) {
+			else if(question.contains("spécialité")) {
 				this.urlApi = specialite + "?nomMedecin=" + NomMedecin;
 			}
-			else if(question.contains("hopital") || question.contains("centre") || question.contains("clinique")) {
+			else if(question.contains("hôpital") || question.contains("centre") || question.contains("clinique")) {
 				this.urlApi = hopital + "?nomMedecin=" + NomMedecin;
 			}
 		}
@@ -114,7 +114,7 @@ public class MessageService {
 				this.urlApi = estObligatoire + "?nomVaccin=" + nomVaccin;
 			
 		}else if(question.contains("vaccin")) {
-			if( (question.contains("tous") || question.contains("liste") || question.contains("different") ) && (!isCountryPresent(question)) && (!question.contains("obligatoire")) ){
+			if( (question.contains("tous") || question.contains("liste") || question.contains("différent") ) && (!isCountryPresent(question)) && (!question.contains("obligatoire")) ){
 				this.urlApi = tousLesVacins;
 			}
 			else if(isCountryPresent(question)) {
@@ -160,11 +160,11 @@ public class MessageService {
 	 * @return true ou false si un nom de docteur est present
 	 */
 	private boolean isDoctorNamePresent(String question) {
-		if (question.contains("professeur dupuis") || question.contains("docteur anne eyouk")
-				|| question.contains("docteur dupont") || question.contains("docteur grace")
-				|| question.contains("docteur oben") || question.contains("docteur ansen")
-				|| question.contains("docteur chance") || question.contains("professeur soigne")
-				|| question.contains("docteur legrand") || question.contains("professeur lefin")) {
+		if (question.contains("professeur dupuy") || question.contains("professeur dupuis") || question.contains("docteur anne")
+				|| question.contains("docteur dupont") || question.contains("docteur grasse") || question.contains("docteur grâce")
+				|| question.contains("docteur aubaine") || question.contains("docteur hobe")  || question.contains("docteur aube")  || question.contains("docteur obe") || question.contains("docteur hansen")
+				|| question.contains("docteur chance") || question.contains("professeur soignies") || question.contains("professeur soign")
+				|| question.contains("docteur legrand") || question.contains("docteur le grand")|| question.contains("professeur le fin") ||  question.contains("professeur lefin") ||  question.contains("professeur le")) {
 			return true;
 		}
 		return false;
@@ -176,11 +176,11 @@ public class MessageService {
 	 * @return true ou false si un nom de vaccin est present dans la question
 	 */
 	private boolean isVaccinNamePresent(String question) {
-		if (question.contains("bcg tuberculose") || question.contains("tétanos") || question.contains("hépatite B")
+		if (question.contains("bcg") || question.contains("tetanos") || question.contains("hépatite b")
 				|| question.contains("diphtérie") || question.contains("poliomyélite")
 				|| question.contains("haemophilus influenzae b") || question.contains("coqueluche")
-				|| question.contains("fièvre jaune") || question.contains("gastro-entérite à rotavirus")
-				|| question.contains("grippe saisonnière") || question.contains("hépatite A")) {
+				|| question.contains("fièvre jaune") || question.contains("gastro")
+				|| question.contains("grippe saisonnière") || question.contains("hépatite a")) {
 			return true;
 		}
 		return false;
@@ -192,8 +192,8 @@ public class MessageService {
 	 * @return true ou false si un nom de specialite est present dans la question
 	 */
 	private boolean isSpecialityPresent(String question) {
-		if (question.contains("gynécologue") || question.contains("generaliste") || question.contains("ophtalmologue")
-				|| question.contains("nutritioniste") || question.contains("gastro-enterologue")
+		if (question.contains("gynécologue") || question.contains("généraliste") || question.contains("ophtalmologue")
+				|| question.contains("nutritioniste") || question.contains("gastro enterologue")
 				|| question.contains("dentiste") || question.contains("chirurgien opthtalmologue")) {
 			return true;
 		}
@@ -206,9 +206,9 @@ public class MessageService {
 	 * @return true ou false si un nom d'hopital est present dans la question
 	 */
 	private boolean isHopitalNamePresent(String question) {
-		if (question.contains("hopital lyon-sud") || question.contains("hopital edouard heriot")
-				|| question.contains("clinique natecia") || question.contains("hopital gratte ciel")
-				|| question.contains("hopital mere et enfant")) {
+		if (question.contains("hôpital sud") || question.contains("hôpital edouard")
+				|| question.contains("clinique natecia") || question.contains("hôpital ciel")
+				|| question.contains("hôpital enfant")) {
 			return true;
 		}
 		return false;
@@ -236,26 +236,26 @@ public class MessageService {
 	 */
 	private String findDoctorName(String question) {
 		String retour = null;
-		if (question.contains("professeur dupuis")) {
+		if (question.contains("professeur dupuy") || question.contains("professeur dupui")) {
 			retour = "professeur dupuis";
-		} else if (question.contains("docteur anne eyouk")) {
+		} else if (question.contains("docteur anne")) {
 			retour = "Docteur anne eyouk";
-		} else if (question.contains("docteur dupont")) {
+		} else if (question.contains("docteur dupont") || question.contains("docteur du pont")) {
 			retour = "Docteur dupont";
-		} else if (question.contains("docteur grace")) {
+		} else if (question.contains("docteur grasse") || question.contains("docteur grâce")) {
 			retour = "Docteur grace";
-		} else if (question.contains("docteur oben")) {
+		} else if (question.contains("docteur aubaine") || question.contains("docteur obe") || question.contains("docteur aube") || question.contains("docteur hobe")) {
 			retour = "Docteur OBEN";
-		} else if (question.contains("docteur ansen")) {
+		} else if (question.contains("docteur hansen")) {
 			retour = "Docteur ansen";
 		} else if (question.contains("docteur chance")) {
 			retour = "Docteur chance";
-		} else if (question.contains("professeur soigne")) {
+		} else if (question.contains("professeur soignies") || question.contains("professeur soigne") || question.contains("professeur soign")) {
 			retour = "professeur soigne";
-		} else if (question.contains("docteur legrand")) {
+		} else if (question.contains("docteur legrand") || question.contains("docteur le grand")) {
 			retour = "Docteur legrand";
-		} else if (question.contains("professeur lefin")) {
-			retour = ("professeur lefin");
+		} else if (question.contains("professeur le fin") || question.contains("professeur lefin")|| question.contains("professeur le")) {
+			retour = "professeur lefin";
 		}
 		return retour;
 	}
@@ -267,11 +267,11 @@ public class MessageService {
 	 */
 	private String findVaccinName(String question) {
 		String retour = null;
-		if (question.contains("bcg tuberculose")) {
+		if (question.contains("tuberculose")) {
 			retour = "BCG tuberculose";
-		} else if (question.contains("tétanos")) {
+		} else if (question.contains("tetanos")) {
 			retour = "Tétanos";
-		} else if (question.contains("hépatite B")) {
+		} else if (question.contains("hépatite b")) {
 			retour = "Hépatite B";
 		} else if (question.contains("diphtérie")) {
 			retour = "Diphtérie";
@@ -283,9 +283,9 @@ public class MessageService {
 			retour = "Coqueluche";
 		} else if (question.contains("fièvre jaune")) {
 			retour = "Fièvre jaune";
-		} else if (question.contains("gastro-entérite à rotavirus")) {
+		} else if (question.contains("gastro")) {
 			retour = "Gastro-entérite à rotavirus";
-		} else if (question.contains("hépatite A")) {
+		} else if (question.contains("hépatite a")) {
 			retour = ("Hépatite A");
 		} else if (question.contains("grippe saisonnière")) {
 			retour = ("Grippe saisonnière");
@@ -300,15 +300,15 @@ public class MessageService {
 	 */
 	private String findHopitalName(String question) {
 		String retour = null;
-		if (question.contains("hopital lyon-sud")) {
+		if (question.contains("hôpital sud")) {
 			retour = "hopital lyon-sud";
-		} else if (question.contains("hopital edouard heriot")) {
+		} else if (question.contains("hôpital edouard")) {
 			retour = "hopital edouard heriot";
-		} else if (question.contains("hopital gratte ciel")) {
+		} else if (question.contains("hôpital ciel")) {
 			retour = "hopital gratte ciel";
 		} else if (question.contains("clinique natecia")) {
 			retour = "Clinique natecia";
-		} else if (question.contains("hopital mere et enfant")) {
+		} else if (question.contains("hôpital enfant")) {
 			retour = "hopital mere et enfant";
 		}
 		return retour;
@@ -323,8 +323,10 @@ public class MessageService {
 		String retour = null;
 		if (question.contains("gynécologue")) {
 			retour = "gynécologue";
-		} else if (question.contains("generaliste")) {
+		} else if (question.contains("généraliste")) {
 			retour = "generaliste";
+		} else if (question.contains("chirurgien opthtalmologue")) {
+			retour = "chirurgien opthtalmologue";
 		} else if (question.contains("ophtalmologue")) {
 			retour = "ophtalmologue";
 		} else if (question.contains("nutritioniste")) {
@@ -333,8 +335,6 @@ public class MessageService {
 			retour = "dentiste";
 		} else if (question.contains("gastro-enterologue")) {
 			retour = "gastro-enterologue";
-		} else if (question.contains("chirurgien opthtalmologue")) {
-			retour = "chirurgien opthtalmologue";
 		}
 		return retour;
 
