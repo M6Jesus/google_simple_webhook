@@ -45,6 +45,10 @@ public class MessageController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
+	String adresse;
+	String displayName;
+
+	
 	/**
 	 * le publisher de l'evenement
 	 */
@@ -86,26 +90,7 @@ public class MessageController {
 			// tout seul a l'utilisateur la permission d'acceder oui ou non a ses données
 			// personnelles
 		
-			
-			Data data = new Data();
-			data.setType("type.googleapis.com/google.actions.v2.PermissionValueSpec");
-			data.setOptContext("connaitre ta position");
-			String[] permissions = { "NAME", "DEVICE_PRECISE_LOCATION" };
-			data.setPermissions(permissions);
-
-			SystemIntent systemIntent = new SystemIntent();
-			systemIntent.setData(data);
-			systemIntent.setIntent("actions.intent.PERMISSION");
-
-			GoogleDemandePermission googleDemandePermission = new GoogleDemandePermission();
-			googleDemandePermission.setExpectUserResponse(true);
-			googleDemandePermission.setSystemIntent(systemIntent);
-			
-			PayloadDemandePermission payloadDemandePermission = new PayloadDemandePermission();
-			payloadDemandePermission.setGoogle(googleDemandePermission);
-			
-			DemandePermission demandePermission = new DemandePermission();
-			demandePermission.setPayload(payloadDemandePermission);
+			DemandePermission demandePermission = demandePermission();
 			return ResponseEntity.status(HttpStatus.OK).body(demandePermission);
 
 		}
@@ -118,11 +103,12 @@ public class MessageController {
 			
 			if(arguments.getTextValue().equals("true") && arguments.isBoolValue()) {
 				// ici l'utilisateur a dit oui, je dois retourner son adresse
-				Location location = payload.getDevice().getLocation();	
-				String adresse = location.getFormattedAddress();
+				Location location = payload.getDevice().getLocation();
+				displayName = payload.getUser().getProfile().getDisplayName();
+				adresse = location.getFormattedAddress();
 				String ville = location.getCity();
 				// je retourne un objet reponse avec l'adresse
-				Reponse reponse = creationReponse("Vous vous trouvez actuellement au " +  adresse + " votre ville est " + ville );
+				Reponse reponse = creationReponse("Vous vous trouvez actuellement au " +  adresse + " votre ville est " + ville + " et votre nom est  " + displayName );
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}
 			else if (arguments.getTextValue().equals("false")) {
@@ -152,7 +138,20 @@ public class MessageController {
 			return ResponseEntity.status(HttpStatus.OK).body(demandePermission);
 		}
 		
+		// retourner le nom de l'utilisateur s'il le demande
 		
+		if (valeurQuestion.contains("nom") || valeurQuestion.contains("prénom") || valeurQuestion.contains("m’appelle")) {
+			if(displayName != null) {
+				Reponse reponse = creationReponse(displayName);
+				return ResponseEntity.status(HttpStatus.OK).body(reponse);
+			}
+			else {
+				DemandePermission demandePermission = demandePermission();
+				return ResponseEntity.status(HttpStatus.OK).body(demandePermission);
+			}
+			
+			
+		}
 	
 		
 		
@@ -161,7 +160,7 @@ public class MessageController {
 		
 
 		// message de fin au cas ou je recois "merci google"
-		if (valeurQuestion.contains("merci") || valeurQuestion.contains("google")) {
+		if (valeurQuestion.contains("merci")) {
 			Reponse reponse = creationReponse("je t'en prie pamela. Qu'est ce que je peux faire pour toi");
 			return ResponseEntity.status(HttpStatus.OK).body(reponse);
 
@@ -232,5 +231,28 @@ public class MessageController {
 		logger.debug("========message arriver a la webhook et publier=============");
 
 		return reponse;
+	}
+	
+	public DemandePermission demandePermission() {
+		Data data = new Data();
+		data.setType("type.googleapis.com/google.actions.v2.PermissionValueSpec");
+		data.setOptContext("connaitre ta position");
+		String[] permissions = { "NAME", "DEVICE_PRECISE_LOCATION" };
+		data.setPermissions(permissions);
+
+		SystemIntent systemIntent = new SystemIntent();
+		systemIntent.setData(data);
+		systemIntent.setIntent("actions.intent.PERMISSION");
+
+		GoogleDemandePermission googleDemandePermission = new GoogleDemandePermission();
+		googleDemandePermission.setExpectUserResponse(true);
+		googleDemandePermission.setSystemIntent(systemIntent);
+		
+		PayloadDemandePermission payloadDemandePermission = new PayloadDemandePermission();
+		payloadDemandePermission.setGoogle(googleDemandePermission);
+		
+		DemandePermission demandePermission = new DemandePermission();
+		demandePermission.setPayload(payloadDemandePermission);
+		return demandePermission;
 	}
 }
