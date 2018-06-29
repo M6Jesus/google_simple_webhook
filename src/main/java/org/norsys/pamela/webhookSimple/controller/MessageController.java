@@ -47,6 +47,7 @@ public class MessageController {
 
 	String adresse;
 	String displayName;
+	String prenom;
 
 	
 	/**
@@ -105,6 +106,7 @@ public class MessageController {
 				// ici l'utilisateur a dit oui, je dois retourner son adresse
 				Location location = payload.getDevice().getLocation();
 				displayName = payload.getUser().getProfile().getDisplayName();
+				prenom = payload.getUser().getProfile().getGivenName();
 				adresse = location.getFormattedAddress();
 				String ville = location.getCity();
 				// je retourne un objet reponse avec l'adresse
@@ -142,7 +144,11 @@ public class MessageController {
 		
 		if (valeurQuestion.contains("nom") || valeurQuestion.contains("prénom") || valeurQuestion.contains("m’appelle")) {
 			if(displayName != null) {
-				Reponse reponse = creationReponse(displayName);
+				Reponse reponse = creationReponse("Vous vous appelez "+ displayName);
+				if(valeurQuestion.contains("prénom")) {
+					reponse = creationReponse("Votre prénom est "+ prenom);
+					return ResponseEntity.status(HttpStatus.OK).body(reponse);
+				}
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}
 			else {
@@ -153,10 +159,6 @@ public class MessageController {
 			
 		}
 	
-		
-		
-		
-		
 		
 
 		// message de fin au cas ou je recois "merci google"
