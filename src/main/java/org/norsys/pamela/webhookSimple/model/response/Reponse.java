@@ -2,6 +2,8 @@ package org.norsys.pamela.webhookSimple.model.response;
 
 import java.util.List;
 
+import org.norsys.pamela.webhookSimple.model.InterfaceReponses.DifferentTypeReponses;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -14,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "fulfillmentText", "fulfillmentMessages", "source", "payload", "outputContexts", "followupEventInput" })
-public class Reponse {
+public class Reponse implements DifferentTypeReponses{
 	
 	@JsonProperty("fulfillmentText")
 	private FulfillmentText fulfillmentText;

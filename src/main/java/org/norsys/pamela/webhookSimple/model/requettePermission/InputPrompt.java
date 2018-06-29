@@ -21,12 +21,19 @@ public class InputPrompt {
 	
 	
 	@JsonProperty("noInputPrompts")
-	private List<NoInputPrompts> noInputPrompts;
-	public List<NoInputPrompts> getNoInputPrompts() {
+	private List noInputPrompts;
+	public List getNoInputPrompts() {
 		return noInputPrompts;
 	}
-	public void setNoInputPrompts(List<NoInputPrompts> noInputPrompts) {
+	public void setNoInputPrompts(List noInputPrompts) {
 		this.noInputPrompts = noInputPrompts;
 	}
+	
+//	public List<NoInputPrompts> getNoInputPrompts() {
+//		return noInputPrompts;
+//	}
+//	public void setNoInputPrompts(List<NoInputPrompts> noInputPrompts) {
+//		this.noInputPrompts = noInputPrompts;
+//	}
 	
 }

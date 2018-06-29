@@ -1,14 +1,15 @@
 package org.norsys.pamela.webhookSimple.model.requettePermission;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonSerialize
 @JsonPropertyOrder({ "state", "data" })
 public class ConversationToken {
-
+	
+	@JsonProperty("state")
 	private String state;
 	public String getState() {
 		return state;
@@ -18,6 +19,7 @@ public class ConversationToken {
 	}
 	
 	
+	@JsonProperty("data")
 	private Data data;
 	public Data getData() {
 		return data;
