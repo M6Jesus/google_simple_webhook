@@ -38,8 +38,8 @@ public class PayloadRequest {
 	public List<Inputs> getInputs() {
 		return inputs;
 	}
-	public void setInputs(List<Inputs> imputs) {
-		this.inputs = imputs;
+	public void setInputs(List<Inputs> inputs) {
+		this.inputs = inputs;
 	}
 	
 	
