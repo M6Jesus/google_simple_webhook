@@ -60,12 +60,12 @@ public class Reponse implements DifferentTypeReponses{
 	
 	
 	@JsonProperty("outputContexts")
-	private List<OutputContexts> outputContexts;
-	public List<OutputContexts> getOutputContexts() {
-		return outputContexts;
+	private List<OutputContextsReponse> outputContextsReponse;
+	public List<OutputContextsReponse> getOutputContexts() {
+		return outputContextsReponse;
 	}
-	public void setOutputContexts(List<OutputContexts> outputContexts) {
-		this.outputContexts = outputContexts;
+	public void setOutputContexts(List<OutputContextsReponse> outputContextsReponse) {
+		this.outputContextsReponse = outputContextsReponse;
 	}
 	
 	

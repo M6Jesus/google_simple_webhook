@@ -21,7 +21,7 @@ public class QueryResult {
 	public String getQueryText() {
 		return queryText;
 	}
-	public void setQueryText(String queryText) {
+	public void setQueryText(final String queryText) {
 		this.queryText = queryText;
 	}
 
@@ -30,7 +30,7 @@ public class QueryResult {
 	public String getAction() {
 		return action;
 	}
-	public void setAction(String action) {
+	public void setAction(final String action) {
 		this.action = action;
 	}
 	
@@ -40,7 +40,7 @@ public class QueryResult {
 	public Parameters getParameters() {
 		return parameters;
 	}
-	public void setParameters(Parameters parameters) {
+	public void setParameters(final Parameters parameters) {
 		this.parameters = parameters;
 	}
 	
@@ -49,7 +49,7 @@ public class QueryResult {
 	public boolean isAllRequiredParamsPresent() {
 		return allRequiredParamsPresent;
 	}
-	public void setAllRequiredParamsPresent(boolean allRequiredParamsPresent) {
+	public void setAllRequiredParamsPresent(final boolean allRequiredParamsPresent) {
 		this.allRequiredParamsPresent = allRequiredParamsPresent;
 	}
 	
@@ -59,7 +59,7 @@ public class QueryResult {
 	public String getFulfillmentText() {
 		return fulfillmentText;
 	}
-	public void setFulfillmentText(String fulfillmentText) {
+	public void setFulfillmentText(final String fulfillmentText) {
 		this.fulfillmentText = fulfillmentText;
 	}
 	
@@ -69,27 +69,26 @@ public class QueryResult {
 	public List<FulfillmentMessages> getFulfillmentMessages() {
 		return fulfillmentMessages;
 	}
-	public void setFulfillmentMessages(List<FulfillmentMessages> fulfillmentMessages) {
+	public void setFulfillmentMessages(final List<FulfillmentMessages> fulfillmentMessages) {
 		this.fulfillmentMessages = fulfillmentMessages;
 	}
 
 
 	@JsonProperty("outputContexts")
-	private OutputContexts outputContexts[];
-	public OutputContexts[] getOutputContexts() {
+	private List<OutputContexts> outputContexts;
+	public List<OutputContexts> getOutputContexts() {
 		return outputContexts;
 	}
-	public void setOutputContexts(OutputContexts[] outputContexts) {
+	public void setOutputContexts(final List<OutputContexts> outputContexts) {
 		this.outputContexts = outputContexts;
 	}
-
 
 	@JsonProperty("intent")
 	private Intent intent;
 	public Intent getIntent() {
 		return intent;
 	}
-	public void setIntent(Intent intent) {
+	public void setIntent(final Intent intent) {
 		this.intent = intent;
 	}
 	
@@ -99,7 +98,7 @@ public class QueryResult {
 	public double getIntentDetectionConfidence() {
 		return intentDetectionConfidence;
 	}
-	public void setIntentDetectionConfidence(double intentDetectionConfidence) {
+	public void setIntentDetectionConfidence(final double intentDetectionConfidence) {
 		this.intentDetectionConfidence = intentDetectionConfidence;
 	}
 	
@@ -109,7 +108,7 @@ public class QueryResult {
 	public DiagnosticInfo getDiagnosticInfo() {
 		return diagnosticInfo;
 	}
-	public void setDiagnosticInfo(DiagnosticInfo diagnosticInfo) {
+	public void setDiagnosticInfo(final DiagnosticInfo diagnosticInfo) {
 		this.diagnosticInfo = diagnosticInfo;
 	}
 	
@@ -119,7 +118,7 @@ public class QueryResult {
 	public String getLanguageCode() {
 		return languageCode;
 	}
-	public void setLanguageCode(String languageCode) {
+	public void setLanguageCode(final String languageCode) {
 		this.languageCode = languageCode;
 	}
 

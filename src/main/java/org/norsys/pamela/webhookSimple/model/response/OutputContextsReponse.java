@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
 /**
- * cette classe represente l'objet FollowupEventInput d'une reponse
+ * cette classe reprensente l'objet OutputContexts d'une reponse
  * @author panou
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"name", "languageCode", "parameters"})
-public class FollowupEventInput {
+@JsonPropertyOrder({"name", "lifespanCount", "parameters" })
+public class OutputContextsReponse {
 	
 	@JsonProperty("name")
 	private String name;
@@ -22,17 +21,17 @@ public class FollowupEventInput {
 	public void setName(final String name) {
 		this.name = name;
 	}
-
 	
-	@JsonProperty("languageCode")
-	private String languageCode;
-	public String getLanguageCode() {
-		return languageCode;
+	
+	@JsonProperty("lifespanCount")
+	private int lifespanCount;
+	public int getLifespanCount() {
+		return lifespanCount;
 	}
-	public void setLanguageCode(final String languageCode) {
-		this.languageCode = languageCode;
+	public void setLifespanCount(final int lifespanCount) {
+		this.lifespanCount = lifespanCount;
 	}
-
+	
 	
 	@JsonProperty("parameters")
 	private ParametersReponse parameters;
@@ -42,5 +41,6 @@ public class FollowupEventInput {
 	public void setParameters(final ParametersReponse parameters) {
 		this.parameters = parameters;
 	}
+	
 	
 }
