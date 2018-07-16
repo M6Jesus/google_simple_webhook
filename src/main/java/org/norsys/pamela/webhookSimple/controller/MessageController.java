@@ -55,6 +55,8 @@ public class MessageController {
 	String prenom;
 	String codeSecret = "1234";
 	Request copieRequette;
+	
+	String prenomSecurite;
 	/**
 	 * le publisher de l'evenement
 	 */
@@ -95,7 +97,47 @@ public class MessageController {
 		if (StringUtils.isNotBlank(queryResult.getAction())) {
 
 			String action = queryResult.getAction();
-
+			
+			//*************************traitement des noms non reconnues
+			//*********************************************************//
+			if (action.equals("UserProvides_firstName")) {
+				Reponse reponse = new Reponse();
+				String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "awaiting_LastName");
+				reponse = creationReponse("nous avons rencontrer un probleme interne. Merci de réessayer plus tard",
+						null, true);
+				String prenoms = valeurQuestion.toLowerCase();
+				if (prenoms.equals("pamela")) {
+					reponse = creationReponse("Merci. vous m'avez dit " + prenoms + ". Pourriez vous me donner votre nom s'il vous plait?", nouveauContexte, false);
+					prenomSecurite = prenoms;
+				}
+				else {
+					reponse = creationReponse("Desoler. vous m'avez dit " + prenoms + ". ce prénom n'est pas connu dans l'application", null, true);
+				}
+				return ResponseEntity.status(HttpStatus.OK).body(reponse);
+			}
+			
+			
+			if (action.equals("UserProvides_LastName")) {
+				Reponse reponse = new Reponse();
+				String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "awaiting_codeSecret");
+				reponse = creationReponse("nous avons rencontrer un probleme interne. Merci de réessayer plus tard",
+						null, true);
+				String noms = valeurQuestion.toLowerCase();
+				if (noms.equals("anou")) {
+					reponse = creationReponse("vous m'avez dit " + noms + ". j'enregistre Ce nom. Merci de me donner le code secret associé à ce nom pour que j'établisse une connexion sécurisé", nouveauContexte, false);
+					prenomSecurite = prenom;
+				}
+				else {
+					reponse = creationReponse("Desoler. vous m'avez dit " + prenomSecurite + " "+ noms + ". ce prénom n'est pas connu dans l'application", null, true);
+					
+				}
+				return ResponseEntity.status(HttpStatus.OK).body(reponse);
+			}
+			
+			
+			
+			
+			
 			// ***********************traitement de la question de la securite
 			// *********************************************//
 
@@ -108,17 +150,17 @@ public class MessageController {
 				// String codeRentrer = arguments.getTextValue();
 
 				reponse = creationReponse("nous avons rencontrer un probleme interne. Merci de réessayer plus tard",
-						null);
+						null, false);
 				if (valeurQuestion.equals(codeSecret)) {
 					String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "connexion_oki");
 					reponse = creationReponse(
 							"Vous avez rentrer le bon code. la connexion viens d'être établi avec l'application ",
-							nouveauContexte);
+							nouveauContexte, false);
 				} else {
 					String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "awaiting_codeSecret2");
 					reponse = creationReponse("vous avez dit " + valeurQuestion
 							+ " ceci n'est malhereusement pas le code associé à ce compte. Veuillez me donner un nouveau code. il vous reste "
-							+ "deux" + " tentatives", nouveauContexte);
+							+ "deux" + " tentatives", nouveauContexte, false);
 				}
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}
@@ -126,33 +168,33 @@ public class MessageController {
 			if (action.equals("UserProvides_secretCode2")) {
 				Reponse reponse = new Reponse();
 				reponse = creationReponse("nous avons rencontrer un probleme interne. Merci de réessayer plus tard",
-						null);
+						null, false);
 				if (valeurQuestion.equals(codeSecret)) {
 					String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "connexion_oki");
 					reponse = creationReponse(
 							"Vous avez rentrer le bon code. la connexion viens d'être établi avec l'application ",
-							nouveauContexte);
+							nouveauContexte, false);
 				} else {
 					String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "endOf_conversation");
 					reponse = creationReponse("vous avez dit " + valeurQuestion
 							+ " ceci n'est malhereusement pas le code associé à ce compte. Veuillez me donner un nouveau code. il vous reste "
-							+ "une" + " tentative", nouveauContexte);
+							+ "une" + " tentative", nouveauContexte, false);
 				}
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}
 			if (action.equals("EndOf_conversation")) {
 				Reponse reponse = new Reponse();
 				reponse = creationReponse("nous avons rencontrer un probleme interne. Merci de réessayer plus tard",
-						null);
+						null, false);
 				if (valeurQuestion.equals(codeSecret)) {
 					String nouveauContexte = RecupereEtRenvoieLeNouveauOutputContext(request, "connexion_oki");
 					reponse = creationReponse(
 							"Vous avez rentrer le bon code. la connexion viens d'être établi avec l'application ",
-							nouveauContexte);
+							nouveauContexte, false);
 				} else {
 					reponse = creationReponse(
 							"Désoler vous n'avez pas donner le bon code. vous n'êtes pas autoriser à vous connecter. Aurevoir!",
-							null);
+							null, false);
 				}
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}
@@ -188,12 +230,12 @@ public class MessageController {
 					String ville = location.getCity();
 					// je retourne un objet reponse avec l'adresse
 					Reponse reponse = creationReponse("Vous vous trouvez actuellement au " + adresse
-							+ " votre ville est " + ville + " et votre nom est  " + displayName, null);
+							+ " votre ville est " + ville + " et votre nom est  " + displayName, null, false);
 					return ResponseEntity.status(HttpStatus.OK).body(reponse);
 				} else if (arguments.getTextValue().equals("false")) {
 					Reponse reponse = creationReponse(
 							"Vous ne m'avez pas donner de permission pour acceder à vos informations personnelles",
-							null);
+							null, false);
 					return ResponseEntity.status(HttpStatus.OK).body(reponse);
 				}
 			}
@@ -227,9 +269,9 @@ public class MessageController {
 				if (valeurQuestion.contains("nom") || valeurQuestion.contains("prénom")
 						|| valeurQuestion.contains("m’appelle")) {
 					if (displayName != null) {
-						Reponse reponse = creationReponse("Vous vous appelez " + displayName, null);
+						Reponse reponse = creationReponse("Vous vous appelez " + displayName, null, false);
 						if (valeurQuestion.contains("prénom")) {
-							reponse = creationReponse("Votre prénom est " + prenom, null);
+							reponse = creationReponse("Votre prénom est " + prenom, null, false);
 							return ResponseEntity.status(HttpStatus.OK).body(reponse);
 						}
 						return ResponseEntity.status(HttpStatus.OK).body(reponse);
@@ -246,7 +288,7 @@ public class MessageController {
 				// message de fin au cas ou je recois "merci google"
 				if (valeurQuestion.contains("merci")) {
 					Reponse reponse = creationReponse("je t'en prie pamela. Qu'est ce que je peux faire pour toi",
-							null);
+							null, false);
 					return ResponseEntity.status(HttpStatus.OK).body(reponse);
 
 				} else {
@@ -263,17 +305,17 @@ public class MessageController {
 						} else if (reponseApiString.contains("false")) {
 							reponseApiString = reponseApiString.replace("false", "non, pas du tout");
 						}
-						Reponse reponse = creationReponse(reponseApiString, null);
+						Reponse reponse = creationReponse(reponseApiString, null, false);
 						return ResponseEntity.status(HttpStatus.OK).body(reponse);
 					} else {
-						Reponse reponse = creationReponse("desoler je n'ai pas cette information", null);
+						Reponse reponse = creationReponse("desoler je n'ai pas cette information", null, false);
 
 						return ResponseEntity.status(HttpStatus.OK).body(reponse);
 					}
 				}
 			}
 		}
-		Reponse reponse = creationReponse("nous n'avons pas d'action de ce genre", null);
+		Reponse reponse = creationReponse("nous n'avons pas d'action de ce genre", null, false);
 		return ResponseEntity.status(HttpStatus.OK).body(reponse);
 	}
 
@@ -285,7 +327,7 @@ public class MessageController {
 	 *            le message à retourner à l'utilisateur sur dialogflow
 	 * @return une reponse creer comportant le message a retourner
 	 */
-	private Reponse creationReponse(final String messageReponse, final String outputContext) {
+	private Reponse creationReponse(final String messageReponse, final String outputContext, final boolean isEndOfConversation) {
 		Reponse reponse = new Reponse();
 		SimpleResponse simpleResponse = new SimpleResponse();
 		simpleResponse.setTextToSpeech(messageReponse);
@@ -300,6 +342,9 @@ public class MessageController {
 		richResponse.setItems(liste);
 		Google google = new Google();
 		google.setExpectUserResponse(true);
+		if(isEndOfConversation == true) {
+			google.setExpectUserResponse(false);
+		}
 		google.setRichResponse(richResponse);
 		Payload payload = new Payload();
 		payload.setGoogle(google);
@@ -332,6 +377,8 @@ public class MessageController {
 
 		return reponse;
 	}
+	
+	
 
 	public String RecupereEtRenvoieLeNouveauOutputContext(final Request request, final String nouveauOUtPutContext) {
 
