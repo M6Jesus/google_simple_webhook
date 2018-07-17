@@ -54,7 +54,6 @@ public class MessageController {
 	String displayName;
 	String prenom;
 	String codeSecret = "1234";
-	Request copieRequette;
 	
 	String prenomSecurite;
 	/**
@@ -88,15 +87,12 @@ public class MessageController {
 		QueryResult queryResult = request.getQueryResult();
 		String valeurQuestion = queryResult.getQueryText();
 
-		// ******************* ici j'essai de recuperer les params de l'utilisateur tel
-		// que la position et le nom ***********************************//
+		String action = queryResult.getAction();
 
 		// je recupere l'action et je regarde si c'est elle contient l'action
 		// request_permission de l'intent request_permission ou l'action user_info de
 		// l'intent user_info
-		if (StringUtils.isNotBlank(queryResult.getAction())) {
-
-			String action = queryResult.getAction();
+		if (StringUtils.isNotBlank(action)) {
 			
 			//*************************traitement des noms non reconnues
 			//*********************************************************//
@@ -111,6 +107,7 @@ public class MessageController {
 					prenomSecurite = prenoms;
 				}
 				else {
+					//***si le prenom n'est pas reconnu je le notifie et ferme la conversation ****///
 					reponse = creationReponse("Desoler. vous m'avez dit " + prenoms + ". ce prénom n'est pas connu dans l'application", null, true);
 				}
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
@@ -125,9 +122,10 @@ public class MessageController {
 				String noms = valeurQuestion.toLowerCase();
 				if (noms.equals("anou")) {
 					reponse = creationReponse("vous m'avez dit " + noms + ". j'enregistre Ce nom. Merci de me donner le code secret associé à ce nom pour que j'établisse une connexion sécurisé", nouveauContexte, false);
-					prenomSecurite = prenom;
+					prenomSecurite = noms;
 				}
 				else {
+					//***si le nom n'est pas reconnu, je le notifie et je ferme la connexion ****//
 					reponse = creationReponse("Desoler. vous m'avez dit " + prenomSecurite + " "+ noms + ". ce prénom n'est pas connu dans l'application", null, true);
 					
 				}
@@ -198,6 +196,7 @@ public class MessageController {
 				}
 				return ResponseEntity.status(HttpStatus.OK).body(reponse);
 			}
+			
 
 			// traitement de la demande de permission pour acces aux données personnelles
 			// **********************************************//
@@ -261,13 +260,17 @@ public class MessageController {
 				demandePermission.setPayload(payloadDemandePermission);
 				return ResponseEntity.status(HttpStatus.OK).body(demandePermission);
 			}
-
-			// retourner le nom de l'utilisateur s'il le demande
+			
+			
+			//*** ici je recupere le nom et le prenom de l'utilisateur en fonction de son accord ***//
+			
 
 			if (action.equals("conversation-intent")) {
-
+				
+				// retourner le nom de l'utilisateur s'il le demande
 				if (valeurQuestion.contains("nom") || valeurQuestion.contains("prénom")
 						|| valeurQuestion.contains("m’appelle")) {
+					//si le nom et le prenom sont deja enregistrer
 					if (displayName != null) {
 						Reponse reponse = creationReponse("Vous vous appelez " + displayName, null, false);
 						if (valeurQuestion.contains("prénom")) {
@@ -276,6 +279,7 @@ public class MessageController {
 						}
 						return ResponseEntity.status(HttpStatus.OK).body(reponse);
 					} else {
+						// si le nom et prenom n'est pas encore enregistrer, je fais la demande de permission pour reuperer 
 						DemandePermission demandePermission = demandePermission();
 						return ResponseEntity.status(HttpStatus.OK).body(demandePermission);
 					}
@@ -319,13 +323,14 @@ public class MessageController {
 		return ResponseEntity.status(HttpStatus.OK).body(reponse);
 	}
 
-	// ************************************** methodes utilisées plus haut pour
-	// encapsulation******************************************//
+// ************************************** methodes utilisées plus haut pour encapsulation******************************************//
+	
 	/**
 	 * 
-	 * @param messageReponse
-	 *            le message à retourner à l'utilisateur sur dialogflow
-	 * @return une reponse creer comportant le message a retourner
+	 * @param messageReponse: la reponse audible a retourner à l'utilisateur
+	 * @param outputContext: la valeur du parametre "name" de l'outputContext
+	 * @param isEndOfConversation: booleen qui permet de creer une reponse qui est une fin de conversation
+	 * @return un objet reponse pour la plateforme dialogflow
 	 */
 	private Reponse creationReponse(final String messageReponse, final String outputContext, final boolean isEndOfConversation) {
 		Reponse reponse = new Reponse();
@@ -343,6 +348,7 @@ public class MessageController {
 		Google google = new Google();
 		google.setExpectUserResponse(true);
 		if(isEndOfConversation == true) {
+			//** dans le cas ou je souhaite fermer la conversation***//
 			google.setExpectUserResponse(false);
 		}
 		google.setRichResponse(richResponse);
@@ -350,7 +356,6 @@ public class MessageController {
 		payload.setGoogle(google);
 		reponse.setPayload(payload);
 
-		// List<FulfillmentMessages> fulfillmentMessages = new ArrayList<>();
 		org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages fulfillmentMessages = new org.norsys.pamela.webhookSimple.model.response.FulfillmentMessages();
 
 		org.norsys.pamela.webhookSimple.model.response.Text texte = new org.norsys.pamela.webhookSimple.model.response.Text();
@@ -374,17 +379,18 @@ public class MessageController {
 			leOutput.add(outputCont);
 			reponse.setOutputContexts(leOutput);
 		}
-
 		return reponse;
 	}
 	
 	
-
+	/**
+	 * 
+	 * @param request un objet requete provenant de la plateforme dialogflow
+	 * @param nouveauOUtPutContext le nom de l'ouputContexte vers lequel je veux faire pointé mon intent
+	 * @return la valeur du parametre "name" dans l'objet reponse
+	 */
 	public String RecupereEtRenvoieLeNouveauOutputContext(final Request request, final String nouveauOUtPutContext) {
-
 		OutputContexts outputContexts = request.getQueryResult().getOutputContexts().get(0);
-		// Parameters parameters = outputContexts.getParameters();
-
 		// ici je recupere le nom de l'ouputcontext avec toutes données de projetId,
 		// session... ce que je veux c'est changer la fin de cette String en mettant le
 		// nouveau contexte souhaiter
@@ -392,13 +398,16 @@ public class MessageController {
 		// enlever le contexte present
 		int indexDernierSlash = name.lastIndexOf('/');
 		String chaineSansContexte = name.substring(0, indexDernierSlash + 1);
-
 		// je concatene le nouveau contexte
-
 		String nouveauName = chaineSansContexte + nouveauOUtPutContext;
 		return nouveauName;
 	}
-
+	
+	/**
+	 * 
+	 * @return un objet reponse qui est une demande de permission
+	 * a l'utilisateur pour l'utilisation de ses données personelles
+	 */
 	public DemandePermission demandePermission() {
 		Data data = new Data();
 		data.setType("type.googleapis.com/google.actions.v2.PermissionValueSpec");
