@@ -133,9 +133,6 @@ public class MessageController {
 			}
 			
 			
-			
-			
-			
 			// ***********************traitement de la question de la securite
 			// *********************************************//
 
