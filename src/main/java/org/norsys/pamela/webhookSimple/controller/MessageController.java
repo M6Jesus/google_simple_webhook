@@ -209,7 +209,7 @@ public class MessageController {
 				return ResponseEntity.status(HttpStatus.OK).body(demandePermission);
 
 			}
-
+			// recuperation des informations de l'utilisateur si disponible
 			if (action.equals("user_info")) {
 				// ici la requete a des information en plus sur l'utilisateur en fonction de sa
 				// reponse, si elle est oui ou non
