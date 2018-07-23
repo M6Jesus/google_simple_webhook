@@ -74,6 +74,22 @@ public class MessageController {
 		ArriverMessage arriverMessage = new ArriverMessage(this, message);
 		applicationEventPublisher.publishEvent(arriverMessage);
 	}
+	
+	
+	
+	
+	
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(final String displayName) {
+		this.displayName = displayName;
+	}
+
+
+
+
 
 	/**
 	 * 

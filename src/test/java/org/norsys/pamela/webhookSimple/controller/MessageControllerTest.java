@@ -44,7 +44,7 @@ public class MessageControllerTest {
 	@Test
 	public void devrais_poster_un_message_simple() {
 		// arrange
-		Request request = creationRequeteSimple("merci", null);
+		Request request = creationRequeteSimple("merci", "conversation-intent");
 		Reponse reponse = CreationReponseSimple("je t'en prie pamela. Qu'est ce que je peux faire pour toi");
 		ResponseEntity<DifferentTypeReponses> expected = ResponseEntity.ok().body(reponse);
 
@@ -122,12 +122,13 @@ public class MessageControllerTest {
 	@Test
 	public void devrais_renvoyer_le_nom_de_user() {
 		//arrange
-		Request request = creationRequeteSimple("quel est mon nom?", null);
+		Request request = creationRequeteSimple("quel est mon nom?", "conversation-intent");
 		String displayName = "PAMELA ANOU";
 		Reponse reponse = CreationReponseSimple("Vous vous appelez " + displayName);
 		ResponseEntity<DifferentTypeReponses> expected = ResponseEntity.ok().body(reponse);
 		
 		//act
+		messageController.setDisplayName(displayName);
 		ResponseEntity<DifferentTypeReponses> reponseController = messageController.posterUnMessage(request);
 		
 		//Assert
