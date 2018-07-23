@@ -1,0 +1,44 @@
+variables:
+    GIT_STRATEGY: clone
+
+stages:
+    - build
+    - docker
+    - deploy
+
+pack:
+    stage: build
+    image: java:8-jdk
+    tags: 
+        - docker 
+    script:
+       - chmod u+x mvnw
+       - ./mvnw package
+    artifacts:
+       expire_in: 1 hr
+       paths:
+          - target/
+          
+docker:
+    stage: docker
+    image: hub-docker.norsys.fr/forge-ci/builder-docker:1.12.2-0
+    tags: 
+        - docker    
+    script:
+        - docker build --tag=hub-docker.norsys.fr/pngoumtsaanou/google_webhook:latest .
+        - docker push hub-docker.norsys.fr/pngoumtsaanou/google_webhook:latest
+    
+fleet:
+    stage: deploy
+    image: hub-docker.norsys.fr/jenkins/slave-fleet:latest
+    tags: 
+        - docker 
+    script:
+        - eval $(ssh-agent -s)
+        - ssh-add /home/jenkins/.ssh/id_rsa
+        - export PATH=$PATH:/home/jenkins/fleet/bin
+        - fleetctl --strict-host-key-checking=false --tunnel=172.20.19.146 stop Thierry_Soler_GoogleHome_google_webhook.service
+        - sleep 30
+        - fleetctl --strict-host-key-checking=false --tunnel=172.20.19.146 start Thierry_Soler_GoogleHome_google_webhook.service
+    only:
+        - tags
