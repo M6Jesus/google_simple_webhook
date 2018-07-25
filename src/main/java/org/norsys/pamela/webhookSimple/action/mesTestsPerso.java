@@ -8,5 +8,8 @@ public class mesTestsPerso {
 		int longeurChaine = name.length();
 		int indexDernierSlash = name.lastIndexOf('/');
 		System.out.println( name.substring(0, name.lastIndexOf("/")+1) );
+		
+		String a = "1eee";
+		System.out.println(a.length());
 	}
 }
